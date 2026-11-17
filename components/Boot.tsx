@@ -12,7 +12,7 @@ export default function Boot() {
         </div>
         <ul className="mt-4 grid grid-cols-2 gap-x-6 sm:grid-cols-4 gap-y-1">
           {agents.names.map((n, i) => (
-            <li key={n} className="boot-row flex justify-between gap-2" style={{ animationDelay: `${i * 35}ms` }}>
+            <li key={n} className="boot-row flex justify-between gap-2" style={{ animationDelay: `${i * 15}ms` }}>
               <span>{n}</span>
               <span className="text-wire">{agents.ready}</span>
             </li>

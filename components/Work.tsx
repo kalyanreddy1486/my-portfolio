@@ -1,6 +1,7 @@
 import { heads, projects } from "@/content";
 import Head from "./Head";
 import Manifesto from "./Manifesto";
+import More from "./More";
 import Numbers from "./Numbers";
 import Project from "./Project";
 import Section from "./Section";
@@ -18,6 +19,8 @@ export default function Work() {
       {projects.map((p, i) => (
         <Project key={p.name} p={p} i={i} />
       ))}
+      <More />
+
     </Section>
   );
 }

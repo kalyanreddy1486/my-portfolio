@@ -76,7 +76,7 @@ const place = (w: HTMLElement, r: { x: number; y: number; w: number; h: number }
 const ease = (p: number) => (p < 0.5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2);
 
 const say = (b: Bot, s: string) => {
-  if (b.st && b.st.textContent !== s) b.st.textContent = s;
+  if (b.st && b.st.dataset.st !== s) b.st.dataset.st = s;
 };
 
 const stripParam = () => {
@@ -262,6 +262,12 @@ function idle() {
   let slot = 0;
   for (const b of bots) {
     if (b.job || b.aux || clock < b.next) continue;
+    if (aux.length >= 8) {
+      say(b, "");
+      b.el.classList.add("gone");
+      b.next = clock + 600;
+      continue;
+    }
     if (!pool) {
       const busy = new Set(aux.map((a) => a.el));
       pool = els.filter((el) => {
@@ -485,7 +491,7 @@ export function init(lay: HTMLElement, botEls: HTMLElement[]) {
     d.classList.add("booted");
     last = 0;
     raf = requestAnimationFrame(tick);
-  }, 1100);
+  }, 450);
   return () => {
     clearTimeout(boot);
     cancelAnimationFrame(raf);

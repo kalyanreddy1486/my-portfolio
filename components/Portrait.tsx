@@ -230,7 +230,7 @@ export default function Portrait({ src, alt }: P) {
     mo.observe(root, { attributes: true, attributeFilter: ["class"] });
 
     const move = (e: PointerEvent) => {
-      if (phase !== "idle" || e.pointerType === "touch") return;
+      if (phase !== "idle") return;
       const r = b.getBoundingClientRect();
       tgt.x = (e.clientX - r.left) / r.width;
       tgt.y = (e.clientY - r.top) / r.height;
@@ -299,7 +299,7 @@ export default function Portrait({ src, alt }: P) {
         src={src}
         alt={alt}
         priority
-        sizes="(min-width: 640px) 720px, 440px"
+        sizes="(min-width: 640px) 64vh, 61vh"
         className="fade-b h-full w-auto max-w-none contrast-125 grayscale transition-opacity duration-500"
       />
       <canvas ref={cv} aria-hidden className="fade-b pointer-events-none absolute inset-0 h-full w-full" />

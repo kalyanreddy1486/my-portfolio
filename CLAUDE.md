@@ -9,15 +9,19 @@ Built from scratch by hand (no create-next-app). Not yet a git repo.
 - `headshot.webp`: current black and white photo on a grey studio background. The site uses `public/headshot.png`, a cut-out of it with real transparency. `headshot.png` in the root is the old photo and is not used. Ignore any other images unless named.
 
 ## Content rules
-- Use ONLY facts from resume.pdf. Never invent numbers, links, dates or employers.
+- Use ONLY facts from resume.pdf and the owner's public GitHub (github.com/kalyanreddy1486: repo READMEs, descriptions, homepages, profile README). The owner authorised GitHub as a source. Never invent numbers, links, dates or employers.
+- Never publish credentials found in repos (the HostelOS README has a demo login; do not copy it).
+- resume.pdf contains a phone number and address: it is gitignored and must never be committed or offered for download.
 - No lorem ipsum. If a detail is missing, leave the element out.
 - Never show a phone number or home address.
 - All content lives in `content.ts`. Components read from it and never hardcode text.
-- The resume has no per-project links. Only link to GitHub, LinkedIn and email.
+- Project links come from GitHub: repo URLs and the HostelOS live site. MetroNear has no public repo, so it has no links.
 
 ## Section mapping
 - Hero: name, degree line, handwritten greeting
-- Work ("Things I've built"): manifesto, numbers strip, then the three Projects only. Never put the internship here.
+- Work ("Things I've built"): manifesto, numbers strip, four featured projects (HostelOS, Sign-Bridge ASL, MetroNear, Real-Time Streaming Analytics), then a compact "More on GitHub" grid. Never put the internship here.
+- Each featured project is a Problem / Built / Result story with stack chips, Live site / Code buttons where links exist, and either a real screenshot (HostelOS, grayscale until hover) or a wireframe illustration.
+- Sign-Bridge ASL is the GitHub name of the resume's "Real-Time Hand Gesture Acquisition and Processing" project.
 - Stack: Skills groups
 - Record ("Track record"): Experience (Viswam AI), then Education and Certifications
 - About: a lead line and a short paragraph that must not repeat the manifesto or the CGPA, plus the "Now" panel (studying, based in, last role, latest build)
@@ -66,7 +70,9 @@ Built from scratch by hand (no create-next-app). Not yet a git repo.
 - Hide unbuilt elements with `visibility: hidden`
 - Add the build-mode class in an inline script in `<head>` to avoid flashes
 - Safety: without JS nothing is hidden (class is only added by script); if the loop has not started within 4s, reveal everything
-- Short boot loader first
+- Short boot loader first (0.45s, 0.6s fade)
+- The hero greeting, name and tag line render immediately (no data-build) so the main content appears without waiting; agents build the rest
+- At most 8 agents review at once; the rest rest off-screen
 - Precedence: `?agents=on|off` URL param > saved localStorage toggle > `prefers-reduced-motion` (shows finished page)
 
 ## Controls

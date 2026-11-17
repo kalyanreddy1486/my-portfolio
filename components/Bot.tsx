@@ -1,6 +1,6 @@
 const tones = [
-  { bg: "#ff3b2f", fg: "#ffffff" },
-  { bg: "#3b82f6", fg: "#ffffff" },
+  { bg: "#d92d22", fg: "#ffffff" },
+  { bg: "#2563eb", fg: "#ffffff" },
   { bg: "#f4f4f5", fg: "#09090b" },
 ];
 
@@ -25,9 +25,9 @@ export default function Bot({ name, tone, ref }: P) {
           <rect className="eye" x="4.2" y="7" width="1.8" height="2.2" rx="0.6" fill={c.bg} />
           <rect className="eye" x="8" y="7" width="1.8" height="2.2" rx="0.6" fill={c.bg} />
         </svg>
-        {name}
+        <span className="bot-nm" data-n={name} />
       </div>
-      <span className="bot-st absolute top-[33px] left-[14px] font-mono text-[7.5px] leading-3 whitespace-nowrap text-zinc-400 opacity-60" />
+      <span className="bot-st absolute top-[33px] left-[14px] font-mono text-[7.5px] leading-3 whitespace-nowrap text-[#8f8f8f]" />
       </div>
     </div>
   );

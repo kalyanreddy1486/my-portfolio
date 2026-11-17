@@ -24,13 +24,13 @@ export default function Hero() {
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[46svh] bg-gradient-to-t from-ink via-ink/85 to-transparent lg:h-56 lg:via-ink/60" />
       <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col gap-6 px-4 pb-20 sm:px-8 sm:pb-24 lg:flex-row lg:items-end lg:justify-between lg:pb-10">
         <div>
-          <p data-build="type" className="rise font-hand text-2xl [animation-delay:500ms] text-accent sm:text-4xl">
+          <p className="rise font-hand text-2xl [animation-delay:500ms] text-accent sm:text-4xl">
             {site.greet}
           </p>
-          <h1 data-build="type" className="rise mt-1 [animation-delay:600ms] font-display text-[1.9rem] leading-none whitespace-nowrap text-white uppercase sm:text-6xl">
+          <h1 className="rise mt-1 [animation-delay:600ms] font-display text-[1.9rem] leading-none whitespace-nowrap text-white uppercase sm:text-6xl">
             {site.name}
           </h1>
-          <p data-build="type" className="rise mt-3 [animation-delay:700ms] label">
+          <p className="rise mt-3 [animation-delay:700ms] label">
             {hero.tag}
           </p>
         </div>

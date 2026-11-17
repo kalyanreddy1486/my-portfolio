@@ -17,12 +17,14 @@ export default function DockBtn({ icon: I, label, kbd, onClick, disabled, presse
       disabled={disabled}
       aria-pressed={pressed}
       title={`${label} (${kbd})`}
-      aria-label={label}
-      className="btn border-transparent bg-transparent px-2.5 py-1.5 text-[0.72rem] whitespace-nowrap aria-pressed:text-accent"
+      aria-keyshortcuts={kbd}
+      className="btn border-transparent bg-transparent px-2.5 py-1.5 text-[0.75rem] whitespace-nowrap aria-pressed:text-accent"
     >
-      <I size={14} />
-      <span className="hidden lg:inline">{label}</span>
-      <kbd className="hidden rounded border border-zinc-700 px-1 text-[0.6rem] text-zinc-500 xl:inline">{kbd}</kbd>
+      <I size={14} aria-hidden />
+      <span className="sr-only lg:not-sr-only">{label}</span>
+      <kbd aria-hidden className="hidden rounded border border-zinc-700 px-1 text-[0.625rem] text-zinc-400 xl:inline">
+        {kbd}
+      </kbd>
     </button>
   );
 }
