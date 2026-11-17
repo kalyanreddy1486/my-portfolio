@@ -15,11 +15,12 @@ Built from scratch by hand (no create-next-app). Not yet a git repo.
 - No lorem ipsum. If a detail is missing, leave the element out.
 - Never show a phone number or home address.
 - All content lives in `content.ts`. Components read from it and never hardcode text.
-- Project links come from GitHub: repo URLs and the HostelOS live site. MetroNear has no public repo, so it has no links.
+- Project links: GitHub repo URLs plus the owner-provided live sites. MetroNear has no public repo, so it has a live link only.
 
 ## Section mapping
 - Hero: name, degree line, handwritten greeting
-- Work ("Things I've built"): manifesto, numbers strip, four featured projects (HostelOS, Sign-Bridge ASL, MetroNear, Real-Time Streaming Analytics), then a compact "More on GitHub" grid. Never put the internship here.
+- Work ("Things I've built"): manifesto, numbers strip, then four projects (HostelOS, Sign-Bridge ASL, MetroNear, Real-Time Streaming Analytics). No "More on GitHub" grid (owner removed it). Never put the internship here.
+- Live links (from the owner): hostel-os-zeta.vercel.app, metro-near.vercel.app, kkr1486-sign-bridge-asl.hf.space. MetroNear's live map shows CARTO "API KEY REQUIRED" watermarks, so it keeps its wireframe until fixed.
 - Each featured project is a Problem / Built / Result story with stack chips, Live site / Code buttons where links exist, and either a real screenshot (HostelOS, grayscale until hover) or a wireframe illustration.
 - Sign-Bridge ASL is the GitHub name of the resume's "Real-Time Hand Gesture Acquisition and Processing" project.
 - Stack: Skills groups

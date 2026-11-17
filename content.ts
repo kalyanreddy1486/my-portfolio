@@ -81,7 +81,7 @@ export const projects: Proj[] = [
       built: "Webcam frames stream over Socket.IO to a Flask server running MediaPipe Hands and a Keras classifier for A to Z, and a stability window turns held letters into sentences. A second mode plays typed text back as letter-by-letter sign clips.",
       result: "~95% accuracy on normalized hand-landmark features under varying lighting and backgrounds.",
     },
-    links: { code: `${gh}/Sign-Bridge_asl` },
+    links: { live: "https://kkr1486-sign-bridge-asl.hf.space", code: `${gh}/Sign-Bridge_asl` },
   },
   {
     name: "MetroNear",
@@ -95,7 +95,7 @@ export const projects: Proj[] = [
       built: "A TypeScript A* engine over a multi-modal graph composes walk, auto and metro legs into one optimal route, with real-time Google Directions data for traffic-aware last-mile estimates on an interactive MapLibre map.",
       result: "One planner across 12 Indian metro cities and 751 stations, with animated metro line flows.",
     },
-    links: {},
+    links: { live: "https://metro-near.vercel.app" },
   },
   {
     name: "Real-Time Streaming Analytics",
@@ -112,19 +112,6 @@ export const projects: Proj[] = [
     links: { code: `${gh}/Data-Streaming-Analysis` },
   },
 ];
-
-export const more = {
-  label: "More on GitHub",
-  all: { label: "All repositories", href: `${gh}?tab=repositories` },
-  items: [
-    { name: "API Rate Limit Tracker", what: "Dashboard and Chrome extension that tracks API usage, alerts at 70% and 90%, and stores keys AES-256 encrypted.", stack: "Node.js · PostgreSQL · Prisma", year: "2026", href: `${gh}/API-Rate-Limit-Tracker` },
-    { name: "AI Resume Analyzer", what: "Scores a résumé 0 to 100 against a target role, lists missing skills and builds a week-by-week learning roadmap.", stack: "Python · Streamlit · PyPDF2", year: "2026", href: `${gh}/Ai-resume-analyzer` },
-    { name: "Customer Churn Prediction", what: "End-to-end ML pipeline with feature engineering, a gradient-boosted classifier and a dashboard.", stack: "Python · scikit-learn · TypeScript", year: "2026", href: `${gh}/Customer-churn-prediction` },
-    { name: "Revenue Pulse", what: "Sales analysis and revenue prediction pipeline with a Next.js dashboard and a Tableau-ready export.", stack: "Python · Next.js · Recharts", year: "2026", href: `${gh}/Revenue-Pulse` },
-    { name: "CodeBuddy AI", what: "Explains code line by line with the Gemini API.", stack: "React · Express · Gemini", year: "2026", href: `${gh}/CodeBuddy-AI` },
-    { name: "Indian Stock Trading Bot", what: "Intraday and long-term NSE signals from RSI, VWAP, EMA crossovers and MACD.", stack: "TypeScript", year: "2025", href: `${gh}/indian-stock-trading-bot` },
-  ],
-};
 
 export const story = { problem: "Problem", built: "Built", result: "Result", live: "Live site", code: "Code" };
 
@@ -189,7 +176,7 @@ export const manifesto = [
 
 export const numbers = [
   { v: "9.00", l: "CGPA" },
-  { v: String(projects.length + more.items.length), l: "projects" },
+  { v: String(projects.length), l: "projects" },
   { v: String(certs.items.length), l: "certifications" },
   { v: "1", l: "AI internship" },
 ];
