@@ -104,7 +104,10 @@ Built from scratch by hand (no create-next-app). Not yet a git repo.
 - `npm run lint`
 
 ## Deploy
-- Push to a GitHub repo, then import it on vercel.com with Add New > Project and click Deploy
+- Live: https://kalyan-reddy.vercel.app (Vercel project `kalyan-reddy`, connected to github.com/kalyanreddy1486/my-portfolio)
+- Every push to `main` deploys to production automatically
+- `.vercelignore` keeps PDFs and the root original photos out of uploads. Patterns must be anchored with `/` (an unanchored `headshot.png` also matched `public/headshot.png` and broke the build)
+- Never store Vercel or GitHub tokens in the repo; `.env*` is gitignored
 
 ## When finished
 Report how to run it, which resume facts were used, anything left out because it was missing, and the Vercel steps.

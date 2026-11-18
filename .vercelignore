@@ -1,0 +1,7 @@
+*.pdf
+/headshot.png
+/headshot.webp
+.playwright-mcp
+.next
+node_modules
+.env*
