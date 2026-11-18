@@ -8,6 +8,11 @@ export default function Parallax() {
     const fine = matchMedia("(pointer: fine)").matches;
     const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!el || !fine || calm) return;
+    const layers = [
+      [el.querySelector<HTMLElement>(".px-word"), -16, -10],
+      [el.querySelector<HTMLElement>(".px-photo"), 14, 6],
+      [el.querySelector<HTMLElement>(".px-glow"), 36, 20],
+    ] as const;
     let tx = 0;
     let ty = 0;
     let x = 0;
@@ -16,8 +21,7 @@ export default function Parallax() {
     const step = () => {
       x += (tx - x) * 0.08;
       y += (ty - y) * 0.08;
-      el.style.setProperty("--px", x.toFixed(4));
-      el.style.setProperty("--py", y.toFixed(4));
+      for (const [n, kx, ky] of layers) if (n) n.style.transform = `translate3d(${(x * kx).toFixed(2)}px, ${(y * ky).toFixed(2)}px, 0)`;
       raf = Math.abs(tx - x) + Math.abs(ty - y) > 0.001 ? requestAnimationFrame(step) : 0;
     };
     const on = (e: PointerEvent) => {

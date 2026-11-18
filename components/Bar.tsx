@@ -10,11 +10,27 @@ export default function Bar() {
 
   useEffect(() => {
     const top = document.getElementById("top");
-    const on = () => {
-      const h = document.documentElement.scrollHeight - innerHeight;
-      if (prog.current) prog.current.style.transform = `scaleX(${h > 0 ? Math.min(1, scrollY / h) : 0})`;
-      setShow(!!top && top.getBoundingClientRect().bottom < 60);
+    let h = 1;
+    let fold = 0;
+    let raf = 0;
+    const measure = () => {
+      h = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+      fold = top ? top.offsetTop + top.offsetHeight - 60 : 0;
     };
+    const paint = () => {
+      raf = 0;
+      if (prog.current) prog.current.style.transform = `scaleX(${Math.min(1, scrollY / h)})`;
+      setShow(scrollY > fold);
+    };
+    const on = () => {
+      if (!raf) raf = requestAnimationFrame(paint);
+    };
+    const size = () => {
+      measure();
+      on();
+    };
+    const ro = new ResizeObserver(size);
+    ro.observe(document.body);
     const io = new IntersectionObserver(
       (es) => es.forEach((e) => e.isIntersecting && setAct(e.target.id)),
       { rootMargin: "-45% 0px -50% 0px" },
@@ -23,13 +39,13 @@ export default function Bar() {
       const el = document.getElementById(n.id);
       if (el) io.observe(el);
     });
-    on();
+    size();
     addEventListener("scroll", on, { passive: true });
-    addEventListener("resize", on);
     return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
       io.disconnect();
       removeEventListener("scroll", on);
-      removeEventListener("resize", on);
     };
   }, []);
 

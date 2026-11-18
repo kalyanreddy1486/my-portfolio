@@ -61,7 +61,8 @@ Built from scratch by hand (no create-next-app). Not yet a git repo.
 - Cursor names (24): Scout, Layout, Typeset, Motion, QA, Deploy, Copy, Lint, Index, Render, Palette, Review, Grid, Kern, Spacing, Contrast, Cache, Bundle, Audit, Format, Trace, Test, Ship, Polish
 - Each cursor: arrow plus coloured name tag with a tiny robot head (blinking LED eyes, pulsing antenna)
 - Elements use `data-build="type" | "pop" | "wipe"`
-- Max 10 building at once on desktop (6 on phones), in DOM order
+- Max 8 building at once on desktop (5 on phones), in DOM order
+- Performance rules for the engine: read all layout first in each frame (rects cached per frame), then write; visibility comes from an IntersectionObserver, never from measuring every element; only write wire/overlay styles when they change. No scroll handlers that read layout (the Bar caches page height via ResizeObserver). Parallax moves only its three layers. No mix-blend-mode on large areas.
 - Cursors never roam aimlessly. Each one shows a status line naming its task and the content it is working on (→ target, typing / painting / placing, measuring, checking, queued).
 - Agents without a build job do review work on finished elements in view: "measurer" agents (Layout, Grid, Kern, Spacing, Format, Polish, Typeset, Palette, Motion, Render, Bundle, Cache) draw a red dimension line with the element's real pixel size; the rest trace a blue outline and stamp "✓ pass". Building always takes priority over review. Reviews skip oversized elements (wider than 70% of the viewport or taller than 45%).
 - Agent labels are deliberately quiet: name tags 7.5px inside the 68% cursor scale, status lines smaller and at 60% opacity, review marks faint.

@@ -274,8 +274,6 @@ export default function Portrait({ src, alt }: P) {
     ro.observe(b);
     sec.addEventListener("pointermove", move);
     sec.addEventListener("pointerleave", leave);
-    const onScroll = () => ready && phase === "idle" && light();
-    addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
       cancelAnimationFrame(raf);
@@ -283,7 +281,6 @@ export default function Portrait({ src, alt }: P) {
       ro.disconnect();
       sec.removeEventListener("pointermove", move);
       sec.removeEventListener("pointerleave", leave);
-      removeEventListener("scroll", onScroll);
       im.removeEventListener("load", load);
     };
   }, [src]);

@@ -52,6 +52,9 @@ let clock = 0;
 let frame = 0;
 let tour: Tour | null = null;
 let io: IntersectionObserver | null = null;
+let seer: IntersectionObserver | null = null;
+let vis = new Set<HTMLElement>();
+let past: HTMLElement[] = [];
 
 const root = () => document.documentElement;
 const isDone = (el: HTMLElement) => el.dataset.s === "done";
@@ -62,16 +65,31 @@ const tag = (el: HTMLElement) => {
   return el.tagName.toLowerCase();
 };
 
+type Rect = { x: number; y: number; w: number; h: number; top: number; bottom: number };
+
+let cache = new Map<Element, Rect>();
+const prev = new WeakMap<HTMLElement, string>();
+
 const docRect = (el: Element) => {
+  const c = cache.get(el);
+  if (c) return c;
   const r = el.getBoundingClientRect();
-  return { x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height, top: r.top, bottom: r.bottom };
+  const v = { x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height, top: r.top, bottom: r.bottom };
+  cache.set(el, v);
+  return v;
 };
 
-const place = (w: HTMLElement, r: { x: number; y: number; w: number; h: number }) => {
-  w.style.transform = `translate(${r.x - 3}px, ${r.y - 3}px)`;
-  w.style.width = `${r.w + 6}px`;
-  w.style.height = `${r.h + 6}px`;
+const css = (el: HTMLElement, t: string, w: string, h: string) => {
+  const k = `${t}|${w}|${h}`;
+  if (prev.get(el) === k) return;
+  prev.set(el, k);
+  el.style.transform = t;
+  if (w) el.style.width = w;
+  if (h) el.style.height = h;
 };
+
+const place = (w: HTMLElement, r: { x: number; y: number; w: number; h: number }) =>
+  css(w, `translate(${Math.round(r.x - 3)}px, ${Math.round(r.y - 3)}px)`, `${Math.round(r.w + 6)}px`, `${Math.round(r.h + 6)}px`);
 
 const ease = (p: number) => (p < 0.5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2);
 
@@ -150,7 +168,7 @@ function claim(el: HTMLElement, bot: Bot) {
 function spot(j: Job, p: number) {
   const r = docRect(j.el);
   if (j.kind === "type") {
-    if (j.c && !j.go) {
+    if (j.c && !j.go && cache.has(j.c)) {
       const c = docRect(j.c);
       return { x: c.x + 2, y: c.y + c.h * 0.8 };
     }
@@ -193,15 +211,9 @@ function startAux(b: Bot, el: HTMLElement) {
 
 function placeAux(a: Aux) {
   const r = docRect(a.el);
-  const s = a.ov.style;
   if (a.bot.role === "check") return place(a.ov, r);
-  if (a.v) {
-    s.transform = `translate(${r.x + r.w + 10}px, ${r.y}px)`;
-    s.height = `${r.h}px`;
-    return;
-  }
-  s.transform = `translate(${r.x}px, ${r.y + r.h + 8}px)`;
-  s.width = `${r.w}px`;
+  if (a.v) return css(a.ov, `translate(${Math.round(r.x + r.w + 10)}px, ${Math.round(r.y)}px)`, "", `${Math.round(r.h)}px`);
+  css(a.ov, `translate(${Math.round(r.x)}px, ${Math.round(r.y + r.h + 8)}px)`, `${Math.round(r.w)}px`, "");
 }
 
 function auxSpot(a: Aux, p: number) {
@@ -226,7 +238,7 @@ function endAux(a: Aux) {
 
 function review(dt: number) {
   for (const a of [...aux]) {
-    const r = a.el.getBoundingClientRect();
+    const r = docRect(a.el);
     if (r.bottom < 0 || r.top > innerHeight) {
       endAux(a);
       continue;
@@ -245,7 +257,7 @@ function review(dt: number) {
     }
     a.t += dt;
     const p = ease(Math.min(1, a.t / a.dur));
-    a.ov.style.setProperty("--p", p.toFixed(3));
+    a.ov.style.setProperty("--p", p.toFixed(2));
     const s = auxSpot(a, p);
     a.bot.tx = s.x;
     a.bot.ty = s.y;
@@ -254,26 +266,29 @@ function review(dt: number) {
   }
 }
 
-function idle() {
+function idle(acts: (() => void)[], taken: Set<Bot>) {
   if (get().built) return;
   const vh = innerHeight;
   let pool: HTMLElement[] | null = null;
   let q: HTMLElement | null | undefined;
   let slot = 0;
+  let busy = aux.length;
   for (const b of bots) {
-    if (b.job || b.aux || clock < b.next) continue;
-    if (aux.length >= 8) {
-      say(b, "");
-      b.el.classList.add("gone");
-      b.next = clock + 600;
+    if (b.job || b.aux || taken.has(b) || clock < b.next) continue;
+    b.next = clock + 500 + Math.random() * 400;
+    if (busy >= 8) {
+      acts.push(() => {
+        say(b, "");
+        b.el.classList.add("gone");
+      });
       continue;
     }
     if (!pool) {
-      const busy = new Set(aux.map((a) => a.el));
-      pool = els.filter((el) => {
-        if (!isDone(el) || busy.has(el) || clock - (seen.get(el) ?? -1e9) < 4000) return false;
-        const r = el.getBoundingClientRect();
-        return r.width > 24 && r.height > 10 && r.width < innerWidth * 0.7 && r.height < vh * 0.45 && r.top > 4 && r.bottom < vh - 4;
+      const held = new Set(aux.map((a) => a.el));
+      pool = [...vis].filter((el) => {
+        if (!isDone(el) || held.has(el) || clock - (seen.get(el) ?? -1e9) < 4000) return false;
+        const r = docRect(el);
+        return r.w > 24 && r.h > 10 && r.w < innerWidth * 0.7 && r.h < vh * 0.45 && r.top > 4 && r.bottom < vh - 4;
       });
     }
     if (pool.length) {
@@ -287,63 +302,74 @@ function idle() {
           bi = i;
         }
       });
-      startAux(b, pool.splice(bi, 1)[0]);
+      const el = pool.splice(bi, 1)[0];
+      taken.add(b);
+      busy++;
+      acts.push(() => startAux(b, el));
       continue;
     }
     if (q === undefined) {
       q =
         els.find((el) => {
-          if (isDone(el) || claimed.has(el)) return false;
-          const r = el.getBoundingClientRect();
-          return r.width > 0 && r.top > 40 && r.top < vh - 60;
+          if (!vis.has(el) || isDone(el) || claimed.has(el)) return false;
+          const r = docRect(el);
+          return r.w > 0 && r.top > 40 && r.top < vh - 60;
         }) ?? null;
     }
     if (q && slot < 6) {
       const r = docRect(q);
-      wake(b, r.x, r.y);
-      b.tx = Math.max(scrollX + 8, r.x - 34 - (slot % 3) * 30);
-      b.ty = r.y + 6 + Math.floor(slot / 3) * 24;
-      slot++;
-      say(b, "queued");
+      const n = slot++;
+      acts.push(() => {
+        wake(b, r.x, r.y);
+        b.tx = Math.max(scrollX + 8, r.x - 34 - (n % 3) * 30);
+        b.ty = r.y + 6 + Math.floor(n / 3) * 24;
+        say(b, "queued");
+      });
     } else {
-      say(b, "");
-      b.el.classList.add("gone");
+      acts.push(() => {
+        say(b, "");
+        b.el.classList.add("gone");
+      });
     }
-    b.next = clock + 500 + Math.random() * 400;
   }
 }
 
-function sweep() {
+function sweep(acts: (() => void)[], taken: Set<Bot>) {
   const vh = innerHeight;
   let left = 0;
+  let open2 = jobs.length;
+  for (const el of past.splice(0)) if (!isDone(el) && !claimed.has(el)) acts.push(() => (el.dataset.s = "done"));
   for (const el of els) {
     if (isDone(el)) continue;
     left++;
-    if (claimed.has(el)) continue;
-    const r = el.getBoundingClientRect();
-    if (r.bottom < 0 || (r.width === 0 && r.height === 0)) {
-      el.dataset.s = "done";
+    if (claimed.has(el) || !vis.has(el)) continue;
+    const r = docRect(el);
+    if (r.bottom < 0) {
+      acts.push(() => (el.dataset.s = "done"));
       left--;
       continue;
     }
-    if (jobs.length >= max) continue;
+    if (open2 >= max) continue;
     const s = secOf.get(el);
     if (!s || !open.has(s) || r.top > vh * 1.02) continue;
-    const free = bots.filter((b) => !b.job);
+    const free = bots.filter((b) => !b.job && !taken.has(b));
     if (!free.length) continue;
-    const c = docRect(el);
     let best = free[0];
     let bd = Infinity;
     for (const b of free) {
-      const d = Math.hypot(b.x - c.x, b.y - c.y) + (b.aux ? 120 : 0);
+      const d = Math.hypot(b.x - r.x, b.y - r.y) + (b.aux ? 120 : 0);
       if (d < bd) {
         bd = d;
         best = b;
       }
     }
-    claim(el, best);
+    taken.add(best);
+    claimed.add(el);
+    open2++;
+    const b = best;
+    acts.push(() => claim(el, b));
   }
-  for (const j of [...jobs]) if (j.el.getBoundingClientRect().bottom < 0) finish(j);
+  for (const j of jobs) if (docRect(j.el).bottom < 0) acts.push(() => jobs.includes(j) && finish(j));
   if (left === 0 && !jobs.length && !get().built) {
     set({ built: true });
     setTimeout(() => {
@@ -420,10 +446,19 @@ function tick(now: number) {
   if (get().paused) return;
   clock += real;
   frame++;
-  if (frame % 3 === 0) sweep();
+  cache = new Map();
+  for (const j of jobs) {
+    docRect(j.el);
+    if (j.c) docRect(j.c);
+  }
+  for (const a of aux) docRect(a.el);
+  const acts: (() => void)[] = [];
+  const taken = new Set<Bot>();
+  if (frame % 3 === 0) sweep(acts, taken);
+  if (frame % 6 === 0) idle(acts, taken);
+  for (const f of acts) f();
   work(real);
   review(real);
-  if (frame % 6 === 0) idle();
   move(real);
   drive(real);
   if (get().built && !tour && !jobs.length && !aux.length && clock > 4000) {
@@ -465,9 +500,27 @@ export function init(lay: HTMLElement, botEls: HTMLElement[]) {
     { rootMargin: "0px 0px -12% 0px" },
   );
   document.querySelectorAll("[data-sec]").forEach((s) => io?.observe(s));
+  vis = new Set();
+  past = [];
+  els.forEach((el) => {
+    if (!el.getClientRects().length) el.dataset.s = "done";
+  });
+  seer = new IntersectionObserver(
+    (es) =>
+      es.forEach((e) => {
+        const el = e.target as HTMLElement;
+        if (e.isIntersecting) vis.add(el);
+        else {
+          vis.delete(el);
+          if (e.boundingClientRect.bottom < 0) past.push(el);
+        }
+      }),
+    { rootMargin: "0px 0px 4% 0px" },
+  );
+  els.forEach((el) => seer?.observe(el));
   const w = innerWidth;
   const n = w < 768 ? 10 : Math.round(14 + 10 * Math.min(1, (w - 768) / (1440 - 768)));
-  max = w < 768 ? 6 : 10;
+  max = w < 768 ? 5 : 8;
   bots = botEls.slice(0, n).map((el, i) => {
     const x = scrollX + ((i + 0.5) / n) * w;
     const y = scrollY + innerHeight + 40;
@@ -497,6 +550,7 @@ export function init(lay: HTMLElement, botEls: HTMLElement[]) {
     cancelAnimationFrame(raf);
     raf = 0;
     io?.disconnect();
+    seer?.disconnect();
     removeEventListener("keydown", onKey);
     removeEventListener("wheel", onUser);
     removeEventListener("touchstart", onUser);
